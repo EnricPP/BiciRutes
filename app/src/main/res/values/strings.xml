@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BiciRutes</string>
+    <string name="google_maps_key">AIzaSyAZ9s9Ff7Xp24cJwA99ALQAlV29Zqi_aT8</string>
+    <string-array name="filter_options">
+        <item>Data</item>
+        <item>Temps</item>
+        <item>Distància</item>
+        <item>Velocitat mitjana</item>
+        <item>Calories cremades</item>
+    </string-array>
+</resources>

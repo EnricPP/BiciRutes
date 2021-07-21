@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/runFragment"
+        android:icon="@drawable/ic_directions_run"
+        android:title="Rutes" />
+
+    <item android:id="@+id/settingsFragment"
+        android:title="Explora"
+        android:icon="@drawable/ic_explore" />
+
+    <item android:id="@+id/statisticsFragment"
+        android:title="Perfil"
+        android:icon="@drawable/ic_profile" />
+
+</menu>
+
