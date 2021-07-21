@@ -103,4 +103,26 @@
         app:layout_constraintStart_toStartOf="@+id/tvTotalCalories"
         app:layout_constraintTop_toBottomOf="@+id/tvTotalCalories" />
 
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:hint="Nou pes (kg)"
+        android:inputType="numberDecimal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTotalCaloriesInfo" />
+
+    <Button
+        android:id="@+id/btnApplyChanges"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#FFEB3B"
+        android:text="Actualitzar"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/etWeight"
+        app:layout_constraintTop_toTopOf="@+id/etWeight" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

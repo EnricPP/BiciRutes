@@ -25,6 +25,7 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
     @set:Inject
     var isFirstAppOpen = true
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -44,7 +45,7 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
             if (success)
                 findNavController().navigate(R.id.action_setupFragment_to_runFragment)
             else {
-                Snackbar.make(requireView(), "Siusplau emplena tots els camps obligatoris", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(requireView(), "Siusplau emplena tots els camps", Snackbar.LENGTH_LONG).show()
             }
         }
     }
