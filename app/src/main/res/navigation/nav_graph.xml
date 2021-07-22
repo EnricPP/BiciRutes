@@ -35,9 +35,20 @@
         <action
             android:id="@+id/action_trackingFragment_to_runFragment"
             app:destination="@id/runFragment" />
+        <action
+            android:id="@+id/action_trackingFragment_to_trackingInfoFragment"
+            app:destination="@id/trackingInfoFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.registrerutes.ui.fragments.SettingsFragment"
         android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/trackingInfoFragment"
+        android:name="com.example.registrerutes.ui.fragments.TrackingInfoFragment"
+        android:label="TrackingInfoFragment" >
+        <action
+            android:id="@+id/action_trackingInfoFragment_to_runFragment"
+            app:destination="@id/runFragment" />
+    </fragment>
 </navigation>

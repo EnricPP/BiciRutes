@@ -68,8 +68,8 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
         }
 
         btnFinishRun.setOnClickListener{
-            zoomToSeeWholeTrack()
-            endRunAndSaveToDb()
+            showEndTrackingDialog()
+            //endRunAndSaveToDb()
         }
 
         btnCancelRun.setOnClickListener{
@@ -118,10 +118,28 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
 
         val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialog_AppCompat_Light)
             .setTitle("Cancelar la ruta?")
-            .setMessage("Alerta! Vols cancelar i eliminar la ruta?")
+            .setMessage("Alerta! Si prems Eliminar acabarà i eliminaras la ruta la ruta")
             .setIcon(R.drawable.ic_delete)
             .setPositiveButton("Eliminar") { _, _ ->
                 stopRun()
+                findNavController().navigate(R.id.action_trackingFragment_to_runFragment)
+            }
+            .setNegativeButton("Cancelar") { dialogInterface, _ ->
+                dialogInterface.cancel()
+            }
+            .create()
+        dialog.show()
+    }
+
+    private fun showEndTrackingDialog() {
+
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialog_AppCompat_Light)
+            .setTitle("Finalitzar la ruta?")
+            .setMessage("Alerta! Si prems Finalitzar acabarà la ruta")
+            .setIcon(R.drawable.ic_delete)
+            .setPositiveButton("Finalitzar") { _, _ ->
+                stopRun()
+                findNavController().navigate(R.id.action_trackingFragment_to_trackingInfoFragment)
             }
             .setNegativeButton("Cancelar") { dialogInterface, _ ->
                 dialogInterface.cancel()
@@ -133,7 +151,6 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
     private fun stopRun(){
         tvTimer.text = "00:00:00:00"
         sendCommandToService(ACTION_STOP_SERVICE)
-        findNavController().navigate(R.id.action_trackingFragment_to_runFragment)
     }
 
     private fun updateTracking(isTracking: Boolean) {
