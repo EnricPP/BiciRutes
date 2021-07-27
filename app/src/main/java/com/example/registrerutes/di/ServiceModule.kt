@@ -16,8 +16,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped
 
 @Module
-@InstallIn(ServiceComponent::class)
-class ServiceModule {
+@InstallIn(ServiceComponent::class) // Declarem el temps que viuran les dependències del ServiceModule
+class ServiceModule { //Dependències del "Tracking Service"
 
     @ServiceScoped
     @Provides
@@ -48,7 +48,7 @@ class ServiceModule {
         .setAutoCancel(false)
         .setOngoing(true)
         .setSmallIcon(R.drawable.ic_directions_run)
-        .setContentTitle("App Rutes")
+        .setContentTitle("BiciRutes")
         .setContentText("00:00:00")
-        .setContentIntent(pendingIntent)
+        .setContentIntent(pendingIntent) // Si l'usuari clica la notificació volem tornar a la pantalla de registre
 }

@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit
 
 object TrackingUtility {
 
+    //Comprovem que l'usuari ja hagi acceptat els permisos de localització
     fun hasLocationPermissions(context: Context) =
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             EasyPermissions.hasPermissions(
@@ -24,10 +25,12 @@ object TrackingUtility {
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.FOREGROUND_SERVICE,
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION
             )
         }
 
+    // Calculem la distància entre un conjunt de coordenades
     fun calculatePolylineLenght(polyline: Polyline): Float {
         var distance = 0f
         for (i in 0..polyline.size - 2) {
@@ -48,6 +51,7 @@ object TrackingUtility {
     }
 
 
+    // Convertim un temps en ms en format (00:00:00) per la notificació de registre,  o (00:00:00:00) per la pantalla de registre
     fun getFormattedStopWatchTime(ms: Long, includeMillis: Boolean = false): String {
         var milliseconds = ms
         val hours = TimeUnit.MILLISECONDS.toHours(milliseconds)

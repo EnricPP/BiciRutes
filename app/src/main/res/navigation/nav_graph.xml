@@ -21,13 +21,9 @@
         android:name="com.example.registrerutes.ui.fragments.SetupFragment"
         android:label="SetupFragment" >
         <action
-            android:id="@+id/action_setupFragment_to_runFragment"
-            app:destination="@id/runFragment" />
+            android:id="@+id/action_setupFragment_to_exploreFragment"
+            app:destination="@id/exploreFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/statisticsFragment"
-        android:name="com.example.registrerutes.ui.fragments.StatisticsFragment"
-        android:label="StatisticsFragment" />
     <fragment
         android:id="@+id/trackingFragment"
         android:name="com.example.registrerutes.ui.fragments.TrackingFragment"
@@ -40,10 +36,6 @@
             app:destination="@id/trackingInfoFragment" />
     </fragment>
     <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.example.registrerutes.ui.fragments.SettingsFragment"
-        android:label="SettingsFragment" />
-    <fragment
         android:id="@+id/trackingInfoFragment"
         android:name="com.example.registrerutes.ui.fragments.TrackingInfoFragment"
         android:label="TrackingInfoFragment" >
@@ -51,4 +43,12 @@
             android:id="@+id/action_trackingInfoFragment_to_runFragment"
             app:destination="@id/runFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/exploreFragment"
+        android:name="com.example.registrerutes.ui.fragments.ExploreFragment"
+        android:label="ExploreFragment" />
+    <fragment
+        android:id="@+id/personalFragment"
+        android:name="com.example.registrerutes.ui.fragments.PersonalFragment"
+        android:label="PersonalFragment" />
 </navigation>

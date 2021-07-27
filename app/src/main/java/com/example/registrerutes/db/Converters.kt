@@ -7,11 +7,15 @@ import java.io.ByteArrayOutputStream
 
 class Converters {
 
+
+    // Converteix un ByteArray en un Bitmap
     @TypeConverter
     fun toBitmap (bytes: ByteArray): Bitmap {
         return BitmapFactory.decodeByteArray(bytes, 0 ,bytes.size)
     }
 
+
+    // Converteix un Bitmap en un ByteArray, per poder-lo guardar a la bdd
     @TypeConverter
     fun fromBitmap(bmp: Bitmap): ByteArray{
         val outputStream = ByteArrayOutputStream()

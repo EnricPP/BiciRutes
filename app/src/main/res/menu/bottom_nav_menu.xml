@@ -6,11 +6,11 @@
         android:icon="@drawable/ic_directions_run"
         android:title="Rutes" />
 
-    <item android:id="@+id/settingsFragment"
+    <item android:id="@+id/exploreFragment"
         android:title="Explora"
         android:icon="@drawable/ic_explore" />
 
-    <item android:id="@+id/statisticsFragment"
+    <item android:id="@+id/personalFragment"
         android:title="Perfil"
         android:icon="@drawable/ic_profile" />
 

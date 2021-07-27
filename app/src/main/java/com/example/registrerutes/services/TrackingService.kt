@@ -55,33 +55,34 @@ class TrackingService : LifecycleService(){
     var serviceKilled = false
 
     @Inject
-    lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    lateinit var fusedLocationProviderClient: FusedLocationProviderClient // provideFusedLocationProviderClient del fitxer "Service Module"
 
     private val timeRunInSeconds = MutableLiveData<Long>()
 
     @Inject
-    lateinit var baseNotificationBuilder: NotificationCompat.Builder
+    lateinit var baseNotificationBuilder: NotificationCompat.Builder //Notification builder del fitxer "Service Module"
 
-    lateinit var curNotificationBuilder: NotificationCompat.Builder
+    lateinit var curNotificationBuilder: NotificationCompat.Builder //Notificació actual, igual que la base (baseNotificationBuilder) però amb el timer canviat
 
-    companion object {
+    companion object { //valors que volem observar els seus canvis des del Tracking Fragment
         val timeRunInMillis = MutableLiveData<Long>()
         val isTracking = MutableLiveData<Boolean>()
-        val pathPoints = MutableLiveData<Polilines>()
+        val pathPoints = MutableLiveData<Polilines>() // Llista de llistes de coordenades, cada vegada que pausem el registre, les següents coordenades s'afageixen a una nova llista
     }
 
     override fun onCreate() {
         super.onCreate()
-        curNotificationBuilder = baseNotificationBuilder
+        curNotificationBuilder = baseNotificationBuilder // Inicialment la notificació actual és la mateixa que la base
         postInitialValues()
         fusedLocationProviderClient = FusedLocationProviderClient(this)
 
-        isTracking.observe(this, Observer {
+        isTracking.observe(this, Observer { // Obervem si hi han canvis de la variable "isTracking"
             updateLocationTracking(it)
             updateNotificationTrackingState(it)
         })
     }
 
+    // Valors inicials
     private fun postInitialValues() {
         isTracking.postValue(false)
         pathPoints.postValue(mutableListOf())
@@ -89,6 +90,7 @@ class TrackingService : LifecycleService(){
         timeRunInMillis.postValue(0L)
     }
 
+    // Aturar el servei
     private fun killService() {
         serviceKilled = true
         isFirstRun = true
@@ -99,11 +101,10 @@ class TrackingService : LifecycleService(){
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
         intent?.let {
             when(it.action) {
                 ACTION_START_OR_RESUME_SERVICE -> {
-                    if (isFirstRun) {
+                    if (isFirstRun) { // Si és la primera vegada que l'usuari clica "Registrar", posem en marxa el servei de registre en segon plà
                         startForegroundService()
                         isFirstRun = false
                     }
@@ -127,9 +128,9 @@ class TrackingService : LifecycleService(){
     }
 
     private var isTimerEnabled = false
-    private var lapTime = 0L
-    private var timeRun = 0L
-    private var timeStarted = 0L
+    private var lapTime = 0L // Temps des de que iniciem el registre fins que el pausem
+    private var timeRun = 0L // Temps total de la ruta
+    private var timeStarted = 0L // Hora en que començem la ruta
     private var lastSecondTimestamp = 0L
 
     private fun startTimer() {
@@ -138,18 +139,16 @@ class TrackingService : LifecycleService(){
         timeStarted = System.currentTimeMillis()
         isTimerEnabled = true
         CoroutineScope(Dispatchers.Main).launch {
-            while (isTracking.value!!) {
-                // time difference between now and timeStarted
-                lapTime = System.currentTimeMillis() - timeStarted
-                // post the new lapTime
+            while (isTracking.value!!) { // Mentres estem registrant
+                lapTime = System.currentTimeMillis() - timeStarted // Diferència de temps entre l'hora actual i l'hora en que hem començat la ruta
                 timeRunInMillis.postValue(timeRun + lapTime)
-                if (timeRunInMillis.value!! >= lastSecondTimestamp + 1000L) {
-                    timeRunInSeconds.postValue(timeRunInSeconds.value!! + 1)
+                if (timeRunInMillis.value!! >= lastSecondTimestamp + 1000L) { // Comprovem si ha passat un nou segon registrant
+                    timeRunInSeconds.postValue(timeRunInSeconds.value!! + 1) // Afegim un segon al la variable del temps total en segons
                     lastSecondTimestamp += 1000L
                 }
-                delay(TIMER_UPDATE_INTERVAL)
+                delay(TIMER_UPDATE_INTERVAL) // Definim un delay per la corutina
             }
-            timeRun += lapTime
+            timeRun += lapTime // Si no estem registrant, actualitzem el temps total de la ruta
         }
     }
 
@@ -158,14 +157,18 @@ class TrackingService : LifecycleService(){
         isTimerEnabled = false
     }
 
+    // Funció on actualitzem la notificació actual i la mostrem
     private fun updateNotificationTrackingState(isTracking: Boolean) {
-        val notificationActionText = if (isTracking) "Pausar" else "Reprendre"
-        val pendingIntent = if (isTracking) {
+        val notificationActionText =
+            if (isTracking) "Pausar" // Si estem registrant volem poder pausar la ruta des de la notificació
+            else "Reprendre" // Contràriament la volem poder reprendre
+
+        val pendingIntent = if (isTracking) { // Pausem el registre
             val pauseIntent = Intent(this, TrackingService::class.java).apply {
                 action = ACTION_PAUSE_SERVICE
             }
             PendingIntent.getService(this, 1, pauseIntent, FLAG_UPDATE_CURRENT)
-        } else {
+        } else { // Reprenem el registre
             val resumeIntent = Intent(this, TrackingService::class.java).apply {
                 action = ACTION_START_OR_RESUME_SERVICE
             }
@@ -189,10 +192,10 @@ class TrackingService : LifecycleService(){
     private fun updateLocationTracking(isTracking: Boolean) {
         if (isTracking) {
             if (TrackingUtility.hasLocationPermissions(this)) {
-                val request = LocationRequest().apply {
-                    interval = LOCATION_UPDATE_INTERVAL
-                    fastestInterval = FASTEST_LOCATION_INTERVAL
-                    priority = PRIORITY_HIGH_ACCURACY
+                val request = LocationRequest().apply { // Si l'usuari té els permisos de localització, volem rebre actualitzacions de la localització
+                    interval = LOCATION_UPDATE_INTERVAL // Definim cada quan rebem notificacions de localització, en aquest cas cada cinc segons
+                    fastestInterval = FASTEST_LOCATION_INTERVAL // Definim l'interval més ràpid en que podem rebre notificacions de localització, en aquest cas cada dos segons
+                    priority = PRIORITY_HIGH_ACCURACY //
                 }
                 fusedLocationProviderClient.requestLocationUpdates(
                     request,
@@ -200,11 +203,12 @@ class TrackingService : LifecycleService(){
                     Looper.getMainLooper()
                 )
             }
-        } else {
+        } else { // Si no estem registrant, no volem rebre notificacions de localització
             fusedLocationProviderClient.removeLocationUpdates(locationCallback)
         }
     }
 
+    // Afegim la localització al final del últim Polyline
     val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult?) {
             super.onLocationResult(result)
@@ -219,8 +223,8 @@ class TrackingService : LifecycleService(){
         }
     }
 
+    // Afegim una nova localització (coordenada) a la llista
     private fun addPathPoint(location: Location?) {
-        //location is not null
         location?.let {
             val pos = LatLng(location.latitude,location.longitude)
             pathPoints.value?.apply {
@@ -230,11 +234,14 @@ class TrackingService : LifecycleService(){
         }
     }
 
+    // Quan pausem el servei de registre, afegim una llista buida
     private fun addEmptyPolyline() = pathPoints.value?.apply {
         add(mutableListOf())
         pathPoints.postValue(this)
-    } ?: pathPoints.postValue(mutableListOf(mutableListOf()))
+    } ?: pathPoints.postValue(mutableListOf(mutableListOf())) // inicalitzem la llista de llistes de coordenades
 
+
+    // Comença el servei de registre en segon plà
     private fun startForegroundService() {
         startTimer()
         isTracking.postValue(true)
@@ -248,14 +255,15 @@ class TrackingService : LifecycleService(){
         startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
 
         timeRunInSeconds.observe(this, Observer {
-            if (!serviceKilled) {
-            var notification = curNotificationBuilder
+            if (!serviceKilled) { // Assegurem que el servei estigui en marxa
+            var notification = curNotificationBuilder // Actualitzem la notificació actual (cada segon)
                 .setContentText(TrackingUtility.getFormattedStopWatchTime(it * 1000L))
             notificationManager.notify(NOTIFICATION_ID, notification.build())
             }
         })
     }
 
+    // Notificació que avisa a l'usuari que la ruta s'està registrant
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(notificationManager: NotificationManager) {
         var channel = NotificationChannel(

@@ -1,10 +1,8 @@
 package com.example.registrerutes.ui.fragments
 
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -12,17 +10,14 @@ import com.example.registrerutes.R
 import com.example.registrerutes.other.Constants.KEY_WEIGHT
 import com.example.registrerutes.other.TrackingUtility
 import com.example.registrerutes.ui.viewmodels.StatisticsViewModel
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_statistics.*
+import kotlinx.android.synthetic.main.fragment_personal.*
 import javax.inject.Inject
 import kotlin.math.round
 
 @AndroidEntryPoint
-class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
+class PersonalFragment : Fragment(R.layout.fragment_personal) {
 
     private val viewModel: StatisticsViewModel by viewModels()
 
@@ -34,6 +29,7 @@ class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
         subscribeToObservers()
         loadFieldsFromSharedPref()
 
+        // Actualitzem el pes
         btnApplyChanges.setOnClickListener {
             val success = applyChangesToSharedPref()
             if (success) {

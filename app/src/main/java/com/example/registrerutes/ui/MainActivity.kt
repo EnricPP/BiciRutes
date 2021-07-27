@@ -25,13 +25,14 @@ class MainActivity : AppCompatActivity() {
         navigateToTrackingFragmentIfNeeded(intent)
 
         setSupportActionBar(toolbar)
+
         bottomNavigationView.setupWithNavController(navHostFragment.findNavController())
         bottomNavigationView.setOnNavigationItemReselectedListener { /* Res */ } //Si cliquem la icona del menu de la pantalla on estem, no volem que faci res
 
         navHostFragment.findNavController()
             .addOnDestinationChangedListener { _, destination, _ ->
                 when(destination.id) {
-                    R.id.settingsFragment, R.id.runFragment, R.id.statisticsFragment ->
+                    R.id.exploreFragment, R.id.runFragment, R.id.personalFragment -> //Definim en quins Fragment apareix la barra de navegació
                         bottomNavigationView.visibility = View.VISIBLE
                     else ->  bottomNavigationView.visibility = View.GONE
                 }
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         navigateToTrackingFragmentIfNeeded(intent)
     }
 
+    // Cas on l'usuari clica la notificació de registre. El redirigim cap a la pantalla de registre.
     private fun navigateToTrackingFragmentIfNeeded (intent: Intent?) {
         if(intent?.action == ACTION_SHOW_TRACKING_FRAGMENT){
             navHostFragment.findNavController().navigate(R.id.action_global_trackingFragment)

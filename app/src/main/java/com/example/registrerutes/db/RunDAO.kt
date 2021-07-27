@@ -39,6 +39,4 @@ interface RunDAO {
     @Query("SELECT * FROM running_table ORDER BY distanceInMeters DESC")
     fun getAllRunsSortedByDistance(): LiveData<List<Run>>
 
-
-
 }

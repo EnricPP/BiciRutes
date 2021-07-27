@@ -26,15 +26,16 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
     var isFirstAppOpen = true
 
 
+    // Comprovem si és la primera vegada que l'usuari introdueix en nom i pes. Si no és la primera vegada el redirigim cap a la pantalla de explora
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         if (!isFirstAppOpen) {
             val navOptions = NavOptions.Builder()
-                .setPopUpTo(R.id.settingsFragment, true)
+                .setPopUpTo(R.id.exploreFragment, true)
                 .build()
             findNavController().navigate(
-                R.id.action_setupFragment_to_runFragment,
+                R.id.action_setupFragment_to_exploreFragment,
                 savedInstanceState,
                 navOptions)
         }
@@ -43,13 +44,14 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
             val success = writePersonalDataToSharedPref() //Comprovem que l'usuari hagi entrar les dades
 
             if (success)
-                findNavController().navigate(R.id.action_setupFragment_to_runFragment)
+                findNavController().navigate(R.id.action_setupFragment_to_exploreFragment)
             else {
                 Snackbar.make(requireView(), "Siusplau emplena tots els camps", Snackbar.LENGTH_LONG).show()
             }
         }
     }
 
+    // Guardem el nom i pes
     private fun writePersonalDataToSharedPref(): Boolean {
         val name = etName.text.toString()
         val weight = etWeight.text.toString()

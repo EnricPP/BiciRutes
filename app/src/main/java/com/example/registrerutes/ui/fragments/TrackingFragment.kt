@@ -36,26 +36,18 @@ import kotlin.math.round
 @AndroidEntryPoint
 class TrackingFragment : Fragment(R.layout.fragment_traking)  {
 
-    private val viewModel: MainViewModel by viewModels()
-
     private var isTracking = false
     private var pathPoints = mutableListOf<Polyline>()
 
     private var map: GoogleMap? = null
 
-    private var curTimeInMillis = 0L
-
-    private var menu: Menu? = null
-
-    @set:Inject
-    var weight = 80f
+    private var curTimeInMillis = 0L // Temps de la ruta
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        setHasOptionsMenu(true)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -63,13 +55,12 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
         super.onViewCreated(view, savedInstanceState)
         mapView.onCreate(savedInstanceState)
 
-        btnToggleRun.setOnClickListener {
+        btnToggleRun.setOnClickListener { //Botó de "Registre / Atura"
             toggleRun()
         }
 
         btnFinishRun.setOnClickListener{
             showEndTrackingDialog()
-            //endRunAndSaveToDb()
         }
 
         btnCancelRun.setOnClickListener{
@@ -84,12 +75,13 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
         subscribeToObservers()
     }
 
+    // Variables del fitxer "Tracking service" de les quals observem els seus canvis
     private fun subscribeToObservers() {
 
         TrackingService.isTracking.observe(viewLifecycleOwner, Observer {
             updateTracking(it)
         })
-
+        
         TrackingService.pathPoints.observe(viewLifecycleOwner, Observer {
             pathPoints = it
             addLatestPolyline()
@@ -105,15 +97,14 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
     }
 
     private fun toggleRun () {
-
-        if (isTracking) {
-            menu?.getItem(0)?.isVisible = true
+        if (isTracking) { // Pausem la ruta
             sendCommandToService(ACTION_PAUSE_SERVICE)
-        } else {
+        } else { // Registrem
             sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
         }
     }
 
+    // Diàleg de cancel·lació  de la ruta
     private fun showCancelTrackingDialog() {
 
         val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialog_AppCompat_Light)
@@ -138,8 +129,7 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
             .setMessage("Alerta! Si prems Finalitzar acabarà la ruta")
             .setIcon(R.drawable.ic_delete)
             .setPositiveButton("Finalitzar") { _, _ ->
-                stopRun()
-                findNavController().navigate(R.id.action_trackingFragment_to_trackingInfoFragment)
+                endRun()
             }
             .setNegativeButton("Cancelar") { dialogInterface, _ ->
                 dialogInterface.cancel()
@@ -148,11 +138,30 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
         dialog.show()
     }
 
+    // Acabar la ruta
+    private fun endRun(){
+        zoomToSeeWholeTrack()
+        map?.snapshot {
+            var distanceInMeters = 0
+            for(polyline in pathPoints) {
+                distanceInMeters += TrackingUtility.calculatePolylineLenght(polyline).toInt() //Càlcul de la distància total
+            }
+            val bundle = Bundle()
+            bundle.putParcelable("snapshot", it)
+            bundle.putLong("time", curTimeInMillis)
+            bundle.putInt("distance", distanceInMeters)
+            stopRun()
+            findNavController().navigate(R.id.action_trackingFragment_to_trackingInfoFragment, bundle) // Passem la captura de la ruta, el temps i la distància al "TrackingInfoFragment"
+        }
+    }
+
+    // Parem la ruta
     private fun stopRun(){
         tvTimer.text = "00:00:00:00"
         sendCommandToService(ACTION_STOP_SERVICE)
     }
 
+    // Depenent de si estem registrant o no, mostrem el botó de registre, aturar o finalitzar la ruta
     private fun updateTracking(isTracking: Boolean) {
         this.isTracking = isTracking
         if (!isTracking && curTimeInMillis > 0L) {
@@ -160,12 +169,13 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
             btnFinishRun.visibility = View.VISIBLE //Si no estem registrant, fem visible el botó de "Finalitzar"
         } else if (isTracking) {
             btnToggleRun.text = "Atura"
-            menu?.getItem(0)?.isVisible = true
+            //?.getItem(0)?.isVisible = true
             btnFinishRun.visibility = View.GONE
         }
     }
 
 
+    // Movem la càmera a la última coordenada
     private fun moveCameraToUser() {
         if (pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
             map?.animateCamera(
@@ -177,26 +187,7 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
         }
     }
 
-    private fun endRunAndSaveToDb () {
-        map?.snapshot { bmp ->
-            var distanceInMeters = 0
-            for(polyline in pathPoints) {
-                distanceInMeters += TrackingUtility.calculatePolylineLenght(polyline).toInt()
-            }
-            val avgSpeed = round((distanceInMeters / 1000f) / (curTimeInMillis / 1000f / 60 / 60)  * 10 ) / 10f //Average speed (km/h)
-            val dateTimestamp = Calendar.getInstance().timeInMillis
-            var caloriesBurned = ((distanceInMeters / 1000f) * weight).toInt() // calories
-            val run = Run(bmp, dateTimestamp, avgSpeed, distanceInMeters, curTimeInMillis, caloriesBurned)
-            viewModel.insertRun(run)
-            Snackbar.make(
-                requireActivity().findViewById(R.id.rootView),
-                "Ruta guardada correctament!",
-                Snackbar.LENGTH_LONG).show()
-            stopRun()
-        }
-    }
-
-
+    // A partir de les coordenades podem definir el marc de la ruta acabda
     private fun zoomToSeeWholeTrack() {
         val bounds = LatLngBounds.Builder()
         for (polyline in pathPoints) {
@@ -209,12 +200,13 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
                 bounds.build(),
                 mapView.width,
                 mapView.height,
-                (mapView.height * 0.03f).toInt()
+                (mapView.height * 0.05f).toInt() // 0.05 serveix per deixar una mica més de marge
             )
         )
     }
 
 
+    // Afegim totes les coordenades al mapa
     private fun addAllPolylines () {
         for (polyline in pathPoints) {
             val polylineOptions = PolylineOptions()
@@ -225,11 +217,12 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
         }
     }
 
+    // Unim les dos últimes coordenades
     private fun addLatestPolyline() {
-        if (pathPoints.isNotEmpty() && pathPoints.last().size > 1) {
+        if (pathPoints.isNotEmpty() && pathPoints.last().size > 1) { // Comprovem que hi hagin coordenades, almenys dos, en la última llista
             val preLastLatLng = pathPoints.last()[pathPoints.last().size - 2]
             val lastLatLng = pathPoints.last().last()
-            val polylineOptions = PolylineOptions()
+            val polylineOptions = PolylineOptions() // Definim com ha de ser la línia del recorregut
                 .color(POLYLINE_COLOR)
                 .width(POLYLINE_WIDTH)
                 .add(preLastLatLng)
@@ -238,11 +231,14 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
         }
     }
 
+    //Definim quina acció realitzar a la funció "onStartCommand" del TrackingService
     private fun sendCommandToService(action: String) =
         Intent(requireContext(), TrackingService::class.java).also {
             it.action = action
             requireContext().startService(it)
         }
+
+    //Funcions que defineixen el cicle de vida del mapa
 
     override fun onResume() {
         super.onResume()
@@ -273,4 +269,5 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
         super.onSaveInstanceState(outState)
         mapView?.onSaveInstanceState(outState)
     }
+
 }

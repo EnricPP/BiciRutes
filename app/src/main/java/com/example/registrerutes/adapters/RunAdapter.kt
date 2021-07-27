@@ -60,9 +60,10 @@ class RunAdapter : RecyclerView.Adapter<RunAdapter.RunViewHolder>() {
     override fun onBindViewHolder(holder: RunViewHolder, position: Int) {
         val run = differ.currentList[position]
 
-
         holder.itemView.apply {
             Glide.with(this).load(run.img).into(ivRunImage)
+
+            tvTitle.text = run.title
 
             val calendar = Calendar.getInstance().apply {
                 timeInMillis = run.timestamp

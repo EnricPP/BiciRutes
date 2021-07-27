@@ -3,6 +3,6 @@ package com.example.registrerutes.ui.fragments
 import androidx.fragment.app.Fragment
 import com.example.registrerutes.R
 
-class SettingsFragment : Fragment(R.layout.fragment_settings) {
+class ExploreFragment : Fragment(R.layout.fragment_explore) {
 
 }

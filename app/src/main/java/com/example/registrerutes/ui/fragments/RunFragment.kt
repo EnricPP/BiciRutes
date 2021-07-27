@@ -85,34 +85,38 @@ class RunFragment : Fragment(R.layout.fragment_run), RunAdapter.ItemListener ,Ea
         (adapter as RunAdapter).setListener(this@RunFragment)
     }
 
+    // Demanem els permisos de localització a l'usuari
     private fun requestPermissions() {
-        if(TrackingUtility.hasLocationPermissions(requireContext())) {
+        if(TrackingUtility.hasLocationPermissions(requireContext())) { //Ja els ha acceptat anteriorment
             return
         }
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             EasyPermissions.requestPermissions(
                 this,
-                "Has d’acceptar els permisos d’ubicació",
+                "Has d’acceptar els permisos d’ubicació per utilizar aquesta aplicació",
                 REQUEST_CODE_LOCATION_PERMISSION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
             )
         }
         else {
             EasyPermissions.requestPermissions(
                 this,
-                "Has d’acceptar els permisos d’ubicació",
+                "Has d’acceptar els permisos d’ubicació utilizar aquesta aplicació",
                 REQUEST_CODE_LOCATION_PERMISSION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION
             )
         }
     }
 
+    //Si l'usuari accepta els permissos no cal fer res mes
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
     }
 
+
+    //Si l'usuari no accepta alguns dels permissos, li tornem a demanar
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
             AppSettingsDialog.Builder(this).build().show()
@@ -122,6 +126,7 @@ class RunFragment : Fragment(R.layout.fragment_run), RunAdapter.ItemListener ,Ea
         }
     }
 
+    //Especifiquem quin és el fragment que rep els resultats del permissos, en aquest cas "this"
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -130,6 +135,7 @@ class RunFragment : Fragment(R.layout.fragment_run), RunAdapter.ItemListener ,Ea
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
     }
+
 
     override fun onItemClicked(run: Run, position: Int) {
 
