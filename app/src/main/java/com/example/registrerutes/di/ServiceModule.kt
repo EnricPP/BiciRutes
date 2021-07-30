@@ -6,7 +6,7 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.example.registrerutes.R
 import com.example.registrerutes.other.Constants
-import com.example.registrerutes.ui.MainActivity
+import com.example.registrerutes.ui.activities.MainActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.Module
 import dagger.Provides

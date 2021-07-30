@@ -40,6 +40,7 @@ object AppModule {
     fun provideSharedPreferences(@ApplicationContext app: Context) =
         app.getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE)
 
+
     @Singleton
     @Provides
     fun provideName(sharedPref: SharedPreferences) = sharedPref.getString(KEY_NAME, "") ?: ""
@@ -47,6 +48,8 @@ object AppModule {
     @Singleton
     @Provides
     fun provideWeight(sharedPref: SharedPreferences) = sharedPref.getFloat(KEY_WEIGHT, 0f)
+
+
 
     @Singleton
     @Provides

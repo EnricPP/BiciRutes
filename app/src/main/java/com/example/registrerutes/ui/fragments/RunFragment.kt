@@ -2,6 +2,7 @@ package com.example.registrerutes.ui.fragments
 
 import android.Manifest
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.registrerutes.R
 import com.example.registrerutes.adapters.RunAdapter
 import com.example.registrerutes.db.Run
+import com.example.registrerutes.other.Constants
 import com.example.registrerutes.other.Constants.REQUEST_CODE_LOCATION_PERMISSION
 import com.example.registrerutes.other.SortType
 import com.example.registrerutes.other.TrackingUtility
@@ -27,18 +29,34 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_run.*
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class RunFragment : Fragment(R.layout.fragment_run), RunAdapter.ItemListener ,EasyPermissions.PermissionCallbacks {
 
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
     private val viewModel: MainViewModel by viewModels()
 
     private lateinit var runAdapter: RunAdapter
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val email = sharedPreferences.getString(Constants.KEY_MAIL, null)
+
+        if (email == null){
+            navHostFragment.findNavController().navigate(R.id.loginFragment)
+        } else {
+            requestPermissions()
+        }
+
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requestPermissions()
         setupRecyclerView()
 
         when(viewModel.sortType) {

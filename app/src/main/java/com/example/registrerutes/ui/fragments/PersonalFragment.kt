@@ -6,12 +6,17 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.example.registrerutes.R
+import com.example.registrerutes.other.Constants
+import com.example.registrerutes.other.Constants.KEY_MAIL
 import com.example.registrerutes.other.Constants.KEY_WEIGHT
 import com.example.registrerutes.other.TrackingUtility
 import com.example.registrerutes.ui.viewmodels.StatisticsViewModel
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_personal.*
 import javax.inject.Inject
 import kotlin.math.round
@@ -24,8 +29,20 @@ class PersonalFragment : Fragment(R.layout.fragment_personal) {
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val email = sharedPreferences.getString(KEY_MAIL, null)
+
+        if (email == null){
+            navHostFragment.findNavController().navigate(R.id.loginFragment)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         subscribeToObservers()
         loadFieldsFromSharedPref()
 
@@ -37,6 +54,14 @@ class PersonalFragment : Fragment(R.layout.fragment_personal) {
             } else {
                 Snackbar.make(view, "Siusplau entra un pes", Snackbar.LENGTH_SHORT).show()
             }
+        }
+
+        logoutButton.setOnClickListener {
+            sharedPreferences.edit()
+                .clear()
+                .apply()
+            FirebaseAuth.getInstance().signOut()
+            navHostFragment.findNavController().navigate(R.id.exploreFragment)
         }
     }
 

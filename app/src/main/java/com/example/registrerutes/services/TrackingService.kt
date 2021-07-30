@@ -12,7 +12,6 @@ import android.content.Intent
 import android.location.Location
 import android.os.Build
 import android.os.Looper
-import android.widget.Button
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
@@ -20,7 +19,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.example.registrerutes.R
 import com.example.registrerutes.other.Constants.ACTION_PAUSE_SERVICE
-import com.example.registrerutes.other.Constants.ACTION_SHOW_TRACKING_FRAGMENT
 import com.example.registrerutes.other.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.example.registrerutes.other.Constants.ACTION_STOP_SERVICE
 import com.example.registrerutes.other.Constants.FASTEST_LOCATION_INTERVAL
@@ -30,7 +28,6 @@ import com.example.registrerutes.other.Constants.NOTIFICATION_CHANNEL_NAME
 import com.example.registrerutes.other.Constants.NOTIFICATION_ID
 import com.example.registrerutes.other.Constants.TIMER_UPDATE_INTERVAL
 import com.example.registrerutes.other.TrackingUtility
-import com.example.registrerutes.ui.MainActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest

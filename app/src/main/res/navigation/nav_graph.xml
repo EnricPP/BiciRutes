@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/setupFragment">
+    app:startDestination="@id/exploreFragment">
 
     <action android:id="@+id/action_global_trackingFragment"
         app:destination="@id/trackingFragment"
@@ -15,14 +15,6 @@
         <action
             android:id="@+id/action_runFragment_to_trackingFragment"
             app:destination="@id/trackingFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/setupFragment"
-        android:name="com.example.registrerutes.ui.fragments.SetupFragment"
-        android:label="SetupFragment" >
-        <action
-            android:id="@+id/action_setupFragment_to_exploreFragment"
-            app:destination="@id/exploreFragment" />
     </fragment>
     <fragment
         android:id="@+id/trackingFragment"
@@ -51,4 +43,20 @@
         android:id="@+id/personalFragment"
         android:name="com.example.registrerutes.ui.fragments.PersonalFragment"
         android:label="PersonalFragment" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.registrerutes.ui.fragments.LoginFragment"
+        android:label="LoginFragment" >
+        <action
+            android:id="@+id/action_loginFragment_to_signupFragment"
+            app:destination="@id/signupFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signupFragment"
+        android:name="com.example.registrerutes.ui.fragments.SignupFragment"
+        android:label="SignupFragment" >
+        <action
+            android:id="@+id/action_signupFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
 </navigation>
