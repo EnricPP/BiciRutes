@@ -8,11 +8,13 @@
 
     <item android:id="@+id/exploreFragment"
         android:title="Explora"
-        android:icon="@drawable/ic_explore" />
+        android:icon="@drawable/ic_explore"
+        />
 
     <item android:id="@+id/personalFragment"
         android:title="Perfil"
-        android:icon="@drawable/ic_profile" />
+        android:icon="@drawable/ic_profile"
+        />
 
 </menu>
 

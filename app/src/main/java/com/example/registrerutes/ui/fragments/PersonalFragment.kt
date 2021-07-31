@@ -3,16 +3,18 @@ package com.example.registrerutes.ui.fragments
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import android.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.registrerutes.R
-import com.example.registrerutes.other.Constants
 import com.example.registrerutes.other.Constants.KEY_MAIL
 import com.example.registrerutes.other.Constants.KEY_WEIGHT
 import com.example.registrerutes.other.TrackingUtility
 import com.example.registrerutes.ui.viewmodels.StatisticsViewModel
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,10 +23,15 @@ import kotlinx.android.synthetic.main.fragment_personal.*
 import javax.inject.Inject
 import kotlin.math.round
 
+
 @AndroidEntryPoint
 class PersonalFragment : Fragment(R.layout.fragment_personal) {
 
     private val viewModel: StatisticsViewModel by viewModels()
+
+    private val mDrawer: DrawerLayout? = null
+    private val toolbar: Toolbar? = null
+    private val nvDrawer: NavigationView? = null
 
     @Inject
     lateinit var sharedPreferences: SharedPreferences
@@ -62,6 +69,10 @@ class PersonalFragment : Fragment(R.layout.fragment_personal) {
                 .apply()
             FirebaseAuth.getInstance().signOut()
             navHostFragment.findNavController().navigate(R.id.exploreFragment)
+        }
+
+        groupsButton.setOnClickListener {
+            navHostFragment.findNavController().navigate(R.id.action_personalFragment_to_groupFragment)
         }
     }
 

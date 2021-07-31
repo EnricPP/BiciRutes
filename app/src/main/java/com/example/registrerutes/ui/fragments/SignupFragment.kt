@@ -31,20 +31,24 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             if (tvUser.text.isNullOrEmpty() || tvMail.text.isNullOrEmpty() || tvPassword.text.isNullOrEmpty() || tvWeight.text.isNullOrEmpty()) {
                 Snackbar.make(requireView(), "Siusplau emplena tots els camps", Snackbar.LENGTH_SHORT).show()
             } else {
-                FirebaseAuth.getInstance().createUserWithEmailAndPassword(tvMail.text.toString(), tvPassword.text.toString())
-                    .addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            db.collection("users").document(tvMail.text.toString()).set(
-                                hashMapOf(
-                                    "username" to tvUser.text.toString(),
-                                    "weight" to tvWeight.text.toString()
+                if (tvUser.text.toString().length > 15) {
+                    Snackbar.make(requireView(), "L'usuari no pot superar els 15 caràcters", Snackbar.LENGTH_SHORT).show()
+                } else {
+                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(tvMail.text.toString(), tvPassword.text.toString())
+                        .addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                db.collection("users").document(tvMail.text.toString()).set(
+                                    hashMapOf(
+                                        "username" to tvUser.text.toString(),
+                                        "weight" to tvWeight.text.toString()
+                                    )
                                 )
-                            )
-                            findNavController().navigate(R.id.action_signupFragment_to_loginFragment)
-                        } else {
-                            Snackbar.make(requireView(), "Error en el registre", Snackbar.LENGTH_SHORT).show()
+                                findNavController().navigate(R.id.action_signupFragment_to_loginFragment)
+                            } else {
+                                Snackbar.make(requireView(), "Error en el registre", Snackbar.LENGTH_SHORT).show()
+                            }
                         }
-                    }
+                }
             }
         }
     }

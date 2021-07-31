@@ -11,17 +11,19 @@ import com.example.registrerutes.R
 import com.example.registrerutes.db.Run
 import com.example.registrerutes.ui.viewmodels.MainViewModel
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_tracking_info.*
+import java.io.ByteArrayOutputStream
+import java.lang.Math.round
 import java.util.*
 import javax.inject.Inject
-import kotlin.math.round
+
 
 @AndroidEntryPoint
 class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
 
     private val viewModel: MainViewModel by viewModels()
-
     private var distance: Int = 0
     private var time: Long = 0L
     private lateinit var snapshot: Bitmap
@@ -33,6 +35,7 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         val dificultiesArray = resources.getStringArray(R.array.dificulty)
         val modalitiesArray = resources.getStringArray(R.array.modality)
 
@@ -41,6 +44,8 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
 
         dificulties.setAdapter(adapterDificulty)
         modalities.setAdapter(adapterModality)
+
+
 
         //Recollim les dades que ens han passat des del Tracking Fragment
         arguments?.getInt("distance")?.let {
@@ -61,7 +66,8 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
 
     }
 
-    // Guardem la ruta a la bdd
+
+    //Guardem la ruta a la bdd
     private fun endRunAndSaveToDb () {
         val avgSpeed = round((distance / 1000f) / (time / 1000f / 60 / 60)  * 10 ) / 10f
         val dateTimestamp = Calendar.getInstance().timeInMillis
@@ -78,6 +84,8 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
             if(title.isEmpty() || description.isEmpty() || dificulty.isEmpty() || modality.isEmpty()) {
                 Snackbar.make(requireView(), "Siusplau emplena tots els camps", Snackbar.LENGTH_SHORT).show()
             } else {
+                val curTime = System.currentTimeMillis()
+                saveSnapshotToDb(title, curTime)
                 val run = Run(snapshot, dateTimestamp, avgSpeed, distance, time, caloriesBurned, title, description, dificulty, modality)
 
                 viewModel.insertRun(run)
@@ -90,4 +98,14 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
             }
         }
     }
+
+    private fun saveSnapshotToDb(title: String, curTime: Long) {
+        val baos = ByteArrayOutputStream()
+        snapshot.compress(Bitmap.CompressFormat.PNG,100,baos)
+        val data = baos.toByteArray()
+
+        val ref = FirebaseStorage.getInstance().getReference("/routes_caps/$title-$curTime")
+        ref.putBytes(data)
+    }
+
 }
