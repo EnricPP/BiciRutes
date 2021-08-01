@@ -30,11 +30,7 @@
     <fragment
         android:id="@+id/trackingInfoFragment"
         android:name="com.example.registrerutes.ui.fragments.TrackingInfoFragment"
-        android:label="TrackingInfoFragment" >
-        <action
-            android:id="@+id/action_trackingInfoFragment_to_runFragment"
-            app:destination="@id/runFragment" />
-    </fragment>
+        android:label="TrackingInfoFragment" />
     <fragment
         android:id="@+id/exploreFragment"
         android:name="com.example.registrerutes.ui.fragments.ExploreFragment"

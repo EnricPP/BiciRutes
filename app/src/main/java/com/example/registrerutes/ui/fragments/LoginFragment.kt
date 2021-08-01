@@ -6,16 +6,19 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.registrerutes.R
-import com.example.registrerutes.other.Constants.KEY_FIRST_TIME_TOGGLE
 import com.example.registrerutes.other.Constants.KEY_MAIL
+import com.example.registrerutes.other.Constants.KEY_WEIGHT
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_login.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginFragment : Fragment(R.layout.fragment_login) {
+
+    private val db = FirebaseFirestore.getInstance()
 
     @Inject
     lateinit var sharedPref: SharedPreferences
@@ -38,8 +41,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 FirebaseAuth.getInstance().signInWithEmailAndPassword(tvMail.text.toString(), tvPassword.text.toString())
                     .addOnCompleteListener {
                         if (it.isSuccessful){
-                            writePersonalDataToSharedPref(tvMail.text.toString())
-                            findNavController().navigate(R.id.exploreFragment)
+
+                            db.collection("users").document(tvMail.text.toString()).get().addOnSuccessListener {
+                                writePersonalDataToSharedPref(tvMail.text.toString(), it.get("weight") as String?)
+                                findNavController().navigate(R.id.exploreFragment)
+                            }
                         } else {
                             Snackbar.make(requireView(), "Error en les credencials: Correu o contrasenya incorrectes", Snackbar.LENGTH_SHORT).show()
                         }
@@ -49,9 +55,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     }
 
     // Guardem el correu electrònic a les shared preferences
-    private fun writePersonalDataToSharedPref(email: String) {
-        sharedPref.edit()
-            .putString(KEY_MAIL, email)
-            .apply()
+    private fun writePersonalDataToSharedPref(email: String, weight: String?) {
+        if (weight != null) {
+            sharedPref.edit()
+                .putFloat(KEY_WEIGHT, weight.toFloat())
+                .putString(KEY_MAIL, email)
+                .apply()
+        }
     }
 }

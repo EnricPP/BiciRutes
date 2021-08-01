@@ -29,6 +29,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var sharedPref: SharedPreferences
 
 
+    override fun onBackPressed() {
+        //super.onBackPressed()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)

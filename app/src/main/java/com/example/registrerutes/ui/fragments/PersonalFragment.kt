@@ -17,9 +17,12 @@ import com.example.registrerutes.ui.viewmodels.StatisticsViewModel
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_personal.*
+import kotlinx.android.synthetic.main.fragment_personal.etWeight
+import kotlinx.android.synthetic.main.fragment_signup.*
 import javax.inject.Inject
 import kotlin.math.round
 
@@ -29,9 +32,7 @@ class PersonalFragment : Fragment(R.layout.fragment_personal) {
 
     private val viewModel: StatisticsViewModel by viewModels()
 
-    private val mDrawer: DrawerLayout? = null
-    private val toolbar: Toolbar? = null
-    private val nvDrawer: NavigationView? = null
+    private val db = FirebaseFirestore.getInstance()
 
     @Inject
     lateinit var sharedPreferences: SharedPreferences
@@ -91,6 +92,11 @@ class PersonalFragment : Fragment(R.layout.fragment_personal) {
         sharedPreferences.edit()
             .putFloat(KEY_WEIGHT, weightText.toFloat())
             .apply()
+
+        //Actualitzem el pes de l'usuari a la bdd
+        sharedPreferences.getString(KEY_MAIL, "")?.let {
+            db.collection("users").document(it).update("weight", weightText)
+        }
 
         return true
     }
