@@ -2,7 +2,6 @@ package com.example.registrerutes.ui.fragments
 
 import android.content.SharedPreferences
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -11,11 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.registrerutes.R
+import com.example.registrerutes.adapters.PersonalRouteAdapter
 import com.example.registrerutes.db.Run
 import com.example.registrerutes.other.Constants.KEY_MAIL
 import com.example.registrerutes.ui.viewmodels.MainViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -99,8 +100,8 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
         var dificulty = dificulties.text.toString()
         var modality = modalities.text.toString()
 
-        if (title.length > 25) {
-            Snackbar.make(requireView(), "El títol no pot superar els 25 caràcters", Snackbar.LENGTH_SHORT).show()
+        if (title.length > 30) {
+            Snackbar.make(requireView(), "El títol no pot superar els 30 caràcters", Snackbar.LENGTH_SHORT).show()
         }
         else {
             if(title.isEmpty() || description.isEmpty() || dificulty.isEmpty() || modality.isEmpty()) {
@@ -109,18 +110,10 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
                 val route = Route(title,description,dificulty,modality,dateTimestamp,avgSpeed,distance,time,caloriesBurned)
 
                 saveSnapshotToDb(route)
-
-                val run = Run(snapshot, dateTimestamp, avgSpeed, distance, time, caloriesBurned, title, description, dificulty, modality)
-
-
-                viewModel.insertRun(run)
                 Snackbar.make(
                     requireActivity().findViewById(R.id.rootView),
-                    "Ruta guardada correctament!",
-                    Snackbar.LENGTH_LONG).show()
-
-                findNavController().navigate(R.id.runFragment)
-
+                    "Ruta guardada correctament",
+                    Snackbar.LENGTH_SHORT).show()
             }
         }
     }
@@ -144,7 +137,11 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
 
     //Guardem la ruta a la bdd
     private fun saveRunToFirebase(route: Route, uri: String) {
-        val rid = FirebaseAuth.getInstance().uid ?: "" //identificador únic
+
+        //Creem una clau única per la ruta
+        lateinit var dbb : DatabaseReference
+        dbb = FirebaseDatabase.getInstance().getReference("routes")
+        val key = dbb.push().key
 
         val route = hashMapOf(
             "user" to sharedPref.getString(KEY_MAIL, null),
@@ -157,13 +154,17 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
             "distanceInMeters" to route.distanceInMeters,
             "timeInMillis" to route.timeInMillis,
             "caloriesBurned" to route.caloriesBurned,
-            "uri" to uri
+            "uri" to uri,
+            "key" to key
         )
 
-        db.collection("routes").document(rid)
-            .set(route)
-            .addOnSuccessListener { Log.d("TrackingInfoFragment", "Ruta guardada") }
-            .addOnFailureListener { e -> Log.w("TrackingInfoFragment", "Error al guardar la ruta", e) }
+        if (key != null) {
+            db.collection("routes").document(key)
+                .set(route)
+                .addOnSuccessListener { Log.d("TrackingInfoFragment", "Ruta guardada") }
+                .addOnFailureListener { e -> Log.w("TrackingInfoFragment", "Error al guardar la ruta", e) }
+        }
+        findNavController().navigate(R.id.runFragment)
     }
 
 }

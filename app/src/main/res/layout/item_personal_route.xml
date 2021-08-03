@@ -7,7 +7,7 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/tvTitle"
+        android:id="@+id/tvRouteTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
@@ -21,7 +21,7 @@
         android:layout_width="250dp"
         android:layout_height="250dp"
         android:layout_marginLeft="5dp"
-        android:layout_below="@+id/tvTitle"
+        android:layout_below="@+id/tvRouteTitle"
         android:contentDescription="@string/app_name"
         android:scaleType="fitXY" />
 
@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_toEndOf="@+id/ivRunImage"
         android:layout_centerVertical="true"
-        android:layout_below="@+id/tvTitle"
+        android:layout_below="@+id/tvRouteTitle"
         android:text="Data"
         android:textColor="@color/white"
         android:textSize="20sp"
@@ -90,6 +90,7 @@
         android:paddingTop="10dp"
         android:layout_height="wrap_content" />
 
+
     <Button
         android:id="@+id/tvDelete"
         android:layout_width="match_parent"
@@ -108,4 +109,5 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         />
+
 </RelativeLayout>

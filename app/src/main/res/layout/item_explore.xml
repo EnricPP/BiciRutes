@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_margin="2dp"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tvRouteExpTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="Títol de la ruta"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/ivRunImage"
+        android:layout_width="match_parent"
+        android:layout_height="275dp"
+        android:layout_below="@+id/tvRouteExpTitle"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/app_name"
+        android:scaleType="fitXY"
+        />
+
+    <TextView
+        android:id="@+id/tvModality"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivRunImage"
+        android:layout_marginLeft="16dp"
+        android:text="Modalitat"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+
+        />
+
+    <TextView
+        android:id="@+id/tvDificulty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivRunImage"
+        android:layout_marginLeft="16dp"
+        android:layout_toEndOf="@+id/tvModality"
+        android:text="Dificultat"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+
+        />
+
+    <TextView
+        android:id="@+id/tvDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivRunImage"
+        android:layout_alignParentEnd="true"
+        android:layout_marginLeft="16dp"
+        android:layout_toEndOf="@+id/tvDificulty"
+        android:text="Distància"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+
+</RelativeLayout>

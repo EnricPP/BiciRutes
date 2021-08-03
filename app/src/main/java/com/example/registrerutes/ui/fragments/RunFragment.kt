@@ -1,46 +1,56 @@
 package com.example.registrerutes.ui.fragments
 
 import android.Manifest
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.registrerutes.R
-import com.example.registrerutes.adapters.RunAdapter
-import com.example.registrerutes.db.Run
+import com.example.registrerutes.adapters.PersonalRouteAdapter
+import com.example.registrerutes.db.Route
 import com.example.registrerutes.other.Constants
+import com.example.registrerutes.other.Constants.KEY_MAIL
 import com.example.registrerutes.other.Constants.REQUEST_CODE_LOCATION_PERMISSION
-import com.example.registrerutes.other.SortType
 import com.example.registrerutes.other.TrackingUtility
 import com.example.registrerutes.ui.viewmodels.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_run.*
+import kotlinx.coroutines.delay
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.math.E
 
 
 @AndroidEntryPoint
-class RunFragment : Fragment(R.layout.fragment_run), RunAdapter.ItemListener ,EasyPermissions.PermissionCallbacks {
+class RunFragment : Fragment(R.layout.fragment_run), EasyPermissions.PermissionCallbacks, PersonalRouteAdapter.ItemListener {
+
+    private lateinit var db : FirebaseFirestore
+    private lateinit var userRecyclerview : RecyclerView
+    private lateinit var personalRouteAdapter : PersonalRouteAdapter
+    private lateinit var routeArrayList : ArrayList<Route>
+
+    private var sortBy : String = "timestamp"
+
 
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
     private val viewModel: MainViewModel by viewModels()
 
-    private lateinit var runAdapter: RunAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,51 +67,68 @@ class RunFragment : Fragment(R.layout.fragment_run), RunAdapter.ItemListener ,Ea
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRecyclerView()
-
-        when(viewModel.sortType) {
-            SortType.DATE -> spFilter.setSelection(0)
-            SortType.RUNNING_TIME -> spFilter.setSelection(1)
-            SortType.DISTANCE -> spFilter.setSelection(2)
-            SortType.AVG_SPEED -> spFilter.setSelection(3)
-            SortType.CALORIES_BURNED -> spFilter.setSelection(4)
-        }
-
-        spFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                adapterView: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                when(position) {
-                    0 -> viewModel.sortRuns(SortType.DATE)
-                    1 -> viewModel.sortRuns(SortType.RUNNING_TIME)
-                    2 -> viewModel.sortRuns(SortType.DISTANCE)
-                    3 -> viewModel.sortRuns(SortType.AVG_SPEED)
-                    4 -> viewModel.sortRuns(SortType.CALORIES_BURNED)
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-        }
-
-        viewModel.runs.observe(viewLifecycleOwner, Observer {
-            runAdapter.submitList(it)
-        })
-
         fab.setOnClickListener {
             findNavController().navigate(R.id.action_runFragment_to_trackingFragment)
         }
+
+        userRecyclerview = rvRuns
+        userRecyclerview.layoutManager = LinearLayoutManager(requireContext())
+        userRecyclerview.setHasFixedSize(true)
+        routeArrayList = arrayListOf<Route>()
+        personalRouteAdapter = PersonalRouteAdapter(routeArrayList)
+        userRecyclerview.adapter = personalRouteAdapter
+        personalRouteAdapter.setListener(this@RunFragment)
+
+        getSortType()
     }
 
-    private fun setupRecyclerView() = rvRuns.apply {
-        runAdapter = RunAdapter()
-        adapter = runAdapter
-        layoutManager = LinearLayoutManager(requireContext())
-        (adapter as RunAdapter).setListener(this@RunFragment)
+    private fun EventChangeListener() {
+
+        routeArrayList.clear()
+        db = FirebaseFirestore.getInstance()
+        db.collection("routes").whereEqualTo("user", sharedPreferences.getString(KEY_MAIL, null)).orderBy(sortBy, Query.Direction.DESCENDING) //Recollim les rutes de l'usuari actual
+            .addSnapshotListener(object : EventListener<QuerySnapshot>{
+                override fun onEvent(
+                    value: QuerySnapshot?,
+                    error: FirebaseFirestoreException?
+                ) {
+                        if (error != null){
+                            Log.e("Firestore Error", error.message.toString())
+                            return
+                        }
+                        for (dc : DocumentChange in value?.documentChanges!!){
+                            if (dc.type == DocumentChange.Type.ADDED){
+                                routeArrayList.add(dc.document.toObject(Route::class.java))
+                            }
+                        }
+                    personalRouteAdapter.notifyDataSetChanged()
+                }
+            })
     }
+
+    private fun getSortType(){
+
+        spFilter.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View?, pos: Int, id: Long
+            ) {
+                when(pos) {
+                    0 -> sortBy = "timestamp"
+                    1 -> sortBy = "timeInMillis"
+                    2 -> sortBy = "distanceInMeters"
+                    3 -> sortBy = "avgSpeedInKMH"
+                    4 -> sortBy = "caloriesBurned"
+                }
+                EventChangeListener()
+
+            }
+
+            override fun onNothingSelected(arg0: AdapterView<*>?) {
+            }
+        })
+    }
+
 
     // Demanem els permisos de localització a l'usuari
     private fun requestPermissions() {
@@ -155,22 +182,32 @@ class RunFragment : Fragment(R.layout.fragment_run), RunAdapter.ItemListener ,Ea
     }
 
 
-    override fun onItemClicked(run: Run, position: Int) {
-
+    override fun onItemClicked(route: Route) {
         val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialog_AppCompat_Light)
-            .setTitle("Eliminar la ruta")
+            .setTitle("Eliminar la ruta: " + route.title)
             .setMessage("Alerta! Vols eliminar la ruta?")
             .setIcon(R.drawable.ic_delete)
             .setPositiveButton("Eliminar") { _, _ ->
-                viewModel.deletetRun(run)
-                Toast.makeText(context, "Ruta eliminada correctament", Toast.LENGTH_SHORT).show()
+
+                db = FirebaseFirestore.getInstance()
+                route.key?.let {
+                    db.collection("routes").document("/" + it)
+                        .delete()
+                        .addOnSuccessListener {
+                            personalRouteAdapter.notifyDataSetChanged()
+                            Snackbar.make(
+                                this.requireView(),
+                                "Ruta eliminada correctament",
+                                Snackbar.LENGTH_SHORT).show()
+                            EventChangeListener()
+                        }
+                        .addOnFailureListener { e -> Log.w("Delete", "Error deleting document", e) }
+                }
             }
             .setNegativeButton("Cancelar") { dialogInterface, _ ->
                 dialogInterface.cancel()
             }
             .create()
         dialog.show()
-
     }
-
 }
