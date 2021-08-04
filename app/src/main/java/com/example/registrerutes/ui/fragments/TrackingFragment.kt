@@ -3,14 +3,10 @@ package com.example.registrerutes.ui.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.example.registrerutes.R
-import com.example.registrerutes.db.Run
 import com.example.registrerutes.other.Constants.ACTION_PAUSE_SERVICE
 import com.example.registrerutes.other.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.example.registrerutes.other.Constants.ACTION_STOP_SERVICE
@@ -20,18 +16,13 @@ import com.example.registrerutes.other.Constants.POLYLINE_WIDTH
 import com.example.registrerutes.other.TrackingUtility
 import com.example.registrerutes.services.Polyline
 import com.example.registrerutes.services.TrackingService
-import com.example.registrerutes.ui.viewmodels.MainViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_traking.*
-import java.util.*
-import javax.inject.Inject
-import kotlin.math.round
 
 @AndroidEntryPoint
 class TrackingFragment : Fragment(R.layout.fragment_traking)  {

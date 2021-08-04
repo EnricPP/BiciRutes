@@ -7,14 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.registrerutes.R
 import com.example.registrerutes.db.Route
-import com.example.registrerutes.other.TrackingUtility
 import kotlinx.android.synthetic.main.item_explore.view.*
-import kotlinx.android.synthetic.main.item_personal_route.view.*
 import kotlinx.android.synthetic.main.item_personal_route.view.ivRunImage
 import kotlinx.android.synthetic.main.item_personal_route.view.tvDistance
-import kotlinx.android.synthetic.main.item_personal_route.view.tvRouteTitle
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.collections.ArrayList
 
 class ExploreAdapter(private val exploreRouteList : ArrayList<Route>) : RecyclerView.Adapter<ExploreAdapter.MyViewHolder>() {
@@ -43,6 +38,10 @@ class ExploreAdapter(private val exploreRouteList : ArrayList<Route>) : Recycler
 
             val distanceInKm = "Ditància: ${route.distanceInMeters?.div(1000f)} km"
             tvDistance.text = distanceInKm
+
+            if(position == exploreRouteList.size){
+
+            }
 
         }
     }

@@ -7,15 +7,10 @@ import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.registrerutes.R
-import com.example.registrerutes.adapters.PersonalRouteAdapter
-import com.example.registrerutes.db.Run
 import com.example.registrerutes.other.Constants.KEY_MAIL
-import com.example.registrerutes.ui.viewmodels.MainViewModel
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
@@ -33,7 +28,6 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
 
     private val db = FirebaseFirestore.getInstance()
 
-    private val viewModel: MainViewModel by viewModels()
     private var distance: Int = 0
     private var time: Long = 0L
     private lateinit var snapshot: Bitmap
@@ -121,27 +115,28 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
 
     //Guardem la captura de la ruta
     private fun saveSnapshotToDb(route: Route) {
-        val baos = ByteArrayOutputStream()
-        val curTime = System.currentTimeMillis()
-        snapshot.compress(Bitmap.CompressFormat.PNG,100,baos)
-        val data = baos.toByteArray()
-
-        val ref = FirebaseStorage.getInstance().getReference("/routes_caps/${route.title}-$curTime")
-        ref.putBytes(data)
-            .addOnSuccessListener {
-                ref.downloadUrl.addOnSuccessListener {
-                    saveRunToFirebase(route,it.toString())
-                }
-            }
-    }
-
-    //Guardem la ruta a la bdd
-    private fun saveRunToFirebase(route: Route, uri: String) {
 
         //Creem una clau única per la ruta
         lateinit var dbb : DatabaseReference
         dbb = FirebaseDatabase.getInstance().getReference("routes")
         val key = dbb.push().key
+
+        val baos = ByteArrayOutputStream()
+        snapshot.compress(Bitmap.CompressFormat.PNG,100,baos)
+        val data = baos.toByteArray()
+
+        val ref = FirebaseStorage.getInstance().getReference("/routes_caps/${route.title}-$key")
+        ref.putBytes(data)
+            .addOnSuccessListener {
+                ref.downloadUrl.addOnSuccessListener {
+                    saveRunToFirebase(route,it.toString(), key.toString())
+                }
+            }
+    }
+
+    //Guardem la ruta a la bdd
+    private fun saveRunToFirebase(route: Route, uri: String, key: String) {
+
 
         val route = hashMapOf(
             "user" to sharedPref.getString(KEY_MAIL, null),

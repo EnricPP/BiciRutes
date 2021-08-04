@@ -3,18 +3,12 @@ package com.example.registrerutes.ui.fragments
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
-import android.widget.Toolbar
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.registrerutes.R
 import com.example.registrerutes.other.Constants.KEY_MAIL
 import com.example.registrerutes.other.Constants.KEY_WEIGHT
 import com.example.registrerutes.other.TrackingUtility
-import com.example.registrerutes.ui.viewmodels.StatisticsViewModel
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -22,15 +16,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.fragment_personal.etWeight
-import kotlinx.android.synthetic.main.fragment_signup.*
+import java.lang.Math.round
 import javax.inject.Inject
-import kotlin.math.round
+
 
 
 @AndroidEntryPoint
 class PersonalFragment : Fragment(R.layout.fragment_personal) {
 
-    private val viewModel: StatisticsViewModel by viewModels()
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -46,12 +39,12 @@ class PersonalFragment : Fragment(R.layout.fragment_personal) {
         if (email == null){
             navHostFragment.findNavController().navigate(R.id.loginFragment)
         }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subscribeToObservers()
         loadFieldsFromSharedPref()
 
         // Actualitzem el pes
@@ -75,6 +68,26 @@ class PersonalFragment : Fragment(R.layout.fragment_personal) {
         groupsButton.setOnClickListener {
             navHostFragment.findNavController().navigate(R.id.action_personalFragment_to_groupFragment)
         }
+
+        //Recollim les estadístiques totals de l'usuari i les passem als seus respectius textview
+        totalStatistics() { time: Int ,distance: Int, total_avg_speed: Float ,calories: Int ->
+            val totalTimeRun = TrackingUtility.getFormattedStopWatchTime(time.toLong()) //Passem el temps en milisegons al format (00:00:00)
+            tvTotalTime.text = totalTimeRun
+
+            val avgSpeed = round(total_avg_speed * 10f) / 10f
+            val avgSpeedString = "${avgSpeed}km/h"
+            tvAverageSpeed.text = avgSpeedString
+
+            val km = distance / 1000f //Passem la distància a Km
+            val totalDistance = round(km * 10f) / 10f
+            val totalDistanceString = "${totalDistance}km"
+            tvTotalDistance.text = totalDistanceString
+
+            val totalCalories = "${calories}kcal"
+            tvTotalCalories.text = totalCalories
+
+        }
+
     }
 
     private fun loadFieldsFromSharedPref () {
@@ -102,33 +115,30 @@ class PersonalFragment : Fragment(R.layout.fragment_personal) {
     }
 
 
-    private fun subscribeToObservers() {
-        viewModel.totalTime.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                val totalTimeRun = TrackingUtility.getFormattedStopWatchTime(it) //Passem el temps en milisegons al format (00:00:00)
-                tvTotalTime.text = totalTimeRun
+    fun totalStatistics(myCallback: (Int, Int, Float, Int) -> Unit) {
+
+        var total_time = 0
+        var total_distance = 0
+        var total_avg_speed = 0F
+        var total_calories = 0
+        var total = 0
+
+
+        db.collection("routes").whereEqualTo("user", sharedPreferences.getString(KEY_MAIL, null)).get().addOnCompleteListener { routes ->
+            if (routes.isSuccessful) {
+                for (document in routes.result!!) {
+                    total_time += document.data["timeInMillis"].toString().toInt()
+                    total_distance += document.data["distanceInMeters"].toString().toInt()
+                    total_avg_speed += document.data["avgSpeedInKMH"].toString().toFloat()
+                    total_calories += document.data["caloriesBurned"].toString().toInt()
+                    total += 1
+
+                }
+                myCallback(total_time, total_distance, total_avg_speed/total, total_calories)
             }
-        })
-        viewModel.totalDistance.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                val km = it / 1000f //Passem la distància a Km
-                val totalDistance = round(km * 10f) / 10f
-                val totalDistanceString = "${totalDistance}km"
-                tvTotalDistance.text = totalDistanceString
-            }
-        })
-        viewModel.totalAvgSpeed.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                val avgSpeed = round(it * 10f) / 10f
-                val avgSpeedString = "${avgSpeed}km/h"
-                tvAverageSpeed.text = avgSpeedString
-            }
-        })
-        viewModel.totalCalories.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                val totalCalories = "${it}kcal"
-                tvTotalCalories.text = totalCalories
-            }
-        })
+        }
     }
+
 }
+
+

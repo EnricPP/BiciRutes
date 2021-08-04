@@ -7,9 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,19 +18,17 @@ import com.example.registrerutes.other.Constants
 import com.example.registrerutes.other.Constants.KEY_MAIL
 import com.example.registrerutes.other.Constants.REQUEST_CODE_LOCATION_PERMISSION
 import com.example.registrerutes.other.TrackingUtility
-import com.example.registrerutes.ui.viewmodels.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.*
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_run.*
-import kotlinx.coroutines.delay
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.math.E
 
 
 @AndroidEntryPoint
@@ -44,12 +40,11 @@ class RunFragment : Fragment(R.layout.fragment_run), EasyPermissions.PermissionC
     private lateinit var routeArrayList : ArrayList<Route>
 
     private var sortBy : String = "timestamp"
+    val storage = Firebase.storage
 
 
     @Inject
     lateinit var sharedPreferences: SharedPreferences
-
-    private val viewModel: MainViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -191,6 +186,13 @@ class RunFragment : Fragment(R.layout.fragment_run), EasyPermissions.PermissionC
 
                 db = FirebaseFirestore.getInstance()
                 route.key?.let {
+
+                    //Eliminem la captura de la ruta (storage)
+                    val storageRef = storage.reference
+                    val desertRef = storageRef.child("routes_caps/${route.title}-$it")
+                    desertRef.delete()
+
+                    //Eliminem la ruta (bdd)
                     db.collection("routes").document("/" + it)
                         .delete()
                         .addOnSuccessListener {

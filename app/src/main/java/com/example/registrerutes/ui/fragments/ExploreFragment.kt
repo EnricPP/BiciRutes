@@ -8,12 +8,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.registrerutes.R
 import com.example.registrerutes.adapters.ExploreAdapter
-import com.example.registrerutes.adapters.PersonalRouteAdapter
 import com.example.registrerutes.db.Route
-import com.example.registrerutes.other.Constants
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.*
 import kotlinx.android.synthetic.main.fragment_explore.*
-import kotlinx.android.synthetic.main.fragment_run.*
+
 
 class ExploreFragment : Fragment(R.layout.fragment_explore) {
 
@@ -21,6 +20,8 @@ class ExploreFragment : Fragment(R.layout.fragment_explore) {
     private lateinit var exploreRecyclerview : RecyclerView
     private lateinit var exploreAdapter : ExploreAdapter
     private lateinit var routeArrayList : ArrayList<Route>
+
+    private lateinit var lastResult: DocumentSnapshot
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -32,19 +33,31 @@ class ExploreFragment : Fragment(R.layout.fragment_explore) {
         exploreAdapter = ExploreAdapter(routeArrayList)
         exploreRecyclerview.adapter = exploreAdapter
 
+
+        routeArrayList.clear()
+        db = FirebaseFirestore.getInstance()
         EventChangeListener()
 
+        loadRoutes.setOnClickListener {
+            EventChangeListener()
+        }
     }
 
     private fun EventChangeListener() {
 
-        routeArrayList.clear()
+        var query : Query
+
+        if (routeArrayList.isEmpty()) {
+            query = db.collection("routes").orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(5)
+        } else {
+            query = db.collection("routes").orderBy("timestamp", Query.Direction.DESCENDING)
+                .startAfter(lastResult)
+                .limit(5)
+        }
 
 
-        db = FirebaseFirestore.getInstance()
-
-        db.collection("routes").orderBy("timestamp", Query.Direction.DESCENDING) //Recollim totes les rutes
-            .addSnapshotListener(object : EventListener<QuerySnapshot> {
+        query.addSnapshotListener(object : EventListener<QuerySnapshot> {
                 override fun onEvent(
                     value: QuerySnapshot?,
                     error: FirebaseFirestoreException?
@@ -58,7 +71,16 @@ class ExploreFragment : Fragment(R.layout.fragment_explore) {
                             routeArrayList.add(dc.document.toObject(Route::class.java))
                         }
                     }
-                    exploreAdapter.notifyDataSetChanged()
+                    if (value.size() > 0) {
+                        lastResult = value.documents.get(value.size() - 1)
+                        exploreAdapter.notifyDataSetChanged()
+                    }
+                    else{
+                        Snackbar.make(
+                            requireView(),
+                            "No hi han més rutes per mostrar",
+                            Snackbar.LENGTH_SHORT).show()
+                    }
                 }
             })
     }

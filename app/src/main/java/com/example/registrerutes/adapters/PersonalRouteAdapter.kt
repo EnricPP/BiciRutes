@@ -1,19 +1,13 @@
 package com.example.registrerutes.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.registrerutes.R
 import com.example.registrerutes.db.Route
 import com.example.registrerutes.other.TrackingUtility
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.fragment_tracking_info.view.tvTitle
 import kotlinx.android.synthetic.main.item_personal_route.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -72,7 +66,6 @@ class PersonalRouteAdapter(private val personalRouteList : ArrayList<Route>) : R
 
             tvDelete.setOnClickListener {
                 listener.onItemClicked(route)
-                //notifyItemRemoved(position)
             }
 
         }
