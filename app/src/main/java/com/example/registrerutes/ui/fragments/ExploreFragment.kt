@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.registrerutes.R
@@ -14,7 +15,7 @@ import com.google.firebase.firestore.*
 import kotlinx.android.synthetic.main.fragment_explore.*
 
 
-class ExploreFragment : Fragment(R.layout.fragment_explore) {
+class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.ItemListener {
 
     private lateinit var db : FirebaseFirestore
     private lateinit var exploreRecyclerview : RecyclerView
@@ -32,6 +33,7 @@ class ExploreFragment : Fragment(R.layout.fragment_explore) {
         routeArrayList = arrayListOf<Route>()
         exploreAdapter = ExploreAdapter(routeArrayList)
         exploreRecyclerview.adapter = exploreAdapter
+        exploreAdapter.setListener(this@ExploreFragment)
 
 
         routeArrayList.clear()
@@ -83,6 +85,19 @@ class ExploreFragment : Fragment(R.layout.fragment_explore) {
                     }
                 }
             })
+    }
+
+    override fun onItemClicked(route: Route) {
+
+        val bundle = Bundle()
+        bundle.putString("uri", route.uri)
+        bundle.putString("description", route.description)
+        bundle.putString("title", route.title)
+        route.distanceInMeters?.let { bundle.putInt("distance", it) }
+        route.timeInMillis?.let { bundle.putLong("time", it) }
+
+
+        findNavController().navigate(R.id.trackFragment, bundle)
     }
 
 

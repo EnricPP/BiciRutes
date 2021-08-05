@@ -67,4 +67,8 @@
             android:id="@+id/action_groupFragment_to_personalFragment"
             app:destination="@id/personalFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/trackFragment"
+        android:name="com.example.registrerutes.ui.fragments.TrackFragment"
+        android:label="TrackFragment" />
 </navigation>

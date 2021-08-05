@@ -1,5 +1,6 @@
 package com.example.registrerutes.ui.fragments
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -61,7 +62,6 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
 
         dificulties.setAdapter(adapterDificulty)
         modalities.setAdapter(adapterModality)
-
 
 
         //Recollim les dades que ens han passat des del Tracking Fragment

@@ -14,11 +14,23 @@ import kotlin.collections.ArrayList
 
 class ExploreAdapter(private val exploreRouteList : ArrayList<Route>) : RecyclerView.Adapter<ExploreAdapter.MyViewHolder>() {
 
+    private lateinit var listener: ItemListener
+
+    interface ItemListener {
+        fun onItemClicked(route: Route)
+    }
+
+    fun setListener(listener: ItemListener) {
+        this.listener = listener;
+    }
+
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExploreAdapter.MyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.item_explore,
             parent,false)
+
         return ExploreAdapter.MyViewHolder(itemView)
     }
 
@@ -27,6 +39,10 @@ class ExploreAdapter(private val exploreRouteList : ArrayList<Route>) : Recycler
 
 
         holder.itemView.apply {
+
+            setOnClickListener{
+                listener.onItemClicked(route)
+            }
 
             Glide.with(this).load(route.uri).into(ivRunImage)
 
