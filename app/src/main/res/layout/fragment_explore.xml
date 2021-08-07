@@ -9,7 +9,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:drawablePadding="6dp"
-        android:id="@+id/button2"
+        android:id="@+id/filterRoutes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Filtra les rutes"

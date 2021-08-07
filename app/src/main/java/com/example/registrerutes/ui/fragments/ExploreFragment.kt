@@ -24,6 +24,11 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
 
     private lateinit var lastResult: DocumentSnapshot
 
+    private var dificulty: String = ""
+    private var modality: String = ""
+    private var title: String = ""
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -38,26 +43,59 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
 
         routeArrayList.clear()
         db = FirebaseFirestore.getInstance()
+
+        arguments?.getString("dificulty")?.let {
+            this.dificulty = it
+        }
+
+        arguments?.getString("modality")?.let {
+            this.modality = it
+        }
+
+        arguments?.getString("title")?.let {
+            this.title = it
+        }
+
         EventChangeListener()
 
         loadRoutes.setOnClickListener {
             EventChangeListener()
         }
+
+        filterRoutes.setOnClickListener{
+            findNavController().navigate(R.id.filterFragment)
+        }
+
     }
 
     private fun EventChangeListener() {
 
         var query : Query
 
-        if (routeArrayList.isEmpty()) {
-            query = db.collection("routes").orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(5)
-        } else {
-            query = db.collection("routes").orderBy("timestamp", Query.Direction.DESCENDING)
-                .startAfter(lastResult)
-                .limit(5)
-        }
+        query = db.collection("routes")
 
+        if (routeArrayList.isEmpty()) {
+            if (dificulty != "")
+                query = query.whereEqualTo("dificulty", dificulty)
+            if(modality != "")
+                query = query.whereEqualTo("modality", modality)
+            if (title != "") {
+                query = query.whereGreaterThanOrEqualTo("title", title)
+            }
+            query = query.orderBy("timestamp", Query.Direction.DESCENDING)
+            query = query.limit(5)
+
+        } else {
+            if (dificulty != "")
+                query = query.whereEqualTo("dificulty", dificulty)
+            if(modality != "")
+                query = query.whereEqualTo("modality", modality)
+            if (title != "") {
+                query = query.whereGreaterThanOrEqualTo("title", title)
+            }
+            query = query.orderBy("timestamp", Query.Direction.DESCENDING)
+            query = query.startAfter(lastResult).limit(5)
+        }
 
         query.addSnapshotListener(object : EventListener<QuerySnapshot> {
                 override fun onEvent(
@@ -86,6 +124,7 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
                 }
             })
     }
+
 
     override fun onItemClicked(route: Route) {
 
