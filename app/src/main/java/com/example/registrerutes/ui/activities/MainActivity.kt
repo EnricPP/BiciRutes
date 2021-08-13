@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         navHostFragment.findNavController()
             .addOnDestinationChangedListener { _, destination, _ ->
                 when(destination.id) {
-                    R.id.exploreFragment, R.id.runFragment, R.id.personalFragment, R.id.groupFragment -> //Definim en quins Fragment apareix la barra de navegació
+                    R.id.exploreFragment, R.id.runFragment, R.id.personalFragment -> //Definim en quins Fragment apareix la barra de navegació
                         bottomNavigationView.visibility = View.VISIBLE
                     else ->  bottomNavigationView.visibility = View.GONE
                 }

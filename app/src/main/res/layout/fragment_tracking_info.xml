@@ -112,19 +112,41 @@
     </com.google.android.material.textfield.TextInputLayout>
 
 
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/saveRun"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:text="Guardar Ruta"
-        android:textColor="#FFFFFF"
-        app:backgroundTint="#8BC34A"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/cancelRun"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="1"
+            android:text="Descartar"
+            app:backgroundTint="#FF1100"/>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/saveRun"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="Guardar Ruta"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#8BC34A" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

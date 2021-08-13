@@ -38,11 +38,7 @@
     <fragment
         android:id="@+id/personalFragment"
         android:name="com.example.registrerutes.ui.fragments.PersonalFragment"
-        android:label="PersonalFragment" >
-        <action
-            android:id="@+id/action_personalFragment_to_groupFragment"
-            app:destination="@id/groupFragment" />
-    </fragment>
+        android:label="PersonalFragment" />
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.registrerutes.ui.fragments.LoginFragment"
@@ -58,14 +54,6 @@
         <action
             android:id="@+id/action_signupFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/groupFragment"
-        android:name="com.example.registrerutes.ui.fragments.GroupFragment"
-        android:label="GroupFragment" >
-        <action
-            android:id="@+id/action_groupFragment_to_personalFragment"
-            app:destination="@id/personalFragment" />
     </fragment>
     <fragment
         android:id="@+id/trackFragment"

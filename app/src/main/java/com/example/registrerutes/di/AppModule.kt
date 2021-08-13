@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import com.example.registrerutes.other.Constants.KEY_FIRST_TIME_TOGGLE
-import com.example.registrerutes.other.Constants.KEY_NAME
 import com.example.registrerutes.other.Constants.KEY_WEIGHT
 import com.example.registrerutes.other.Constants.SHARED_PREFERENCES_NAME
 import dagger.Module
@@ -26,12 +25,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideName(sharedPref: SharedPreferences) = sharedPref.getString(KEY_NAME, "") ?: ""
-
-    @Singleton
-    @Provides
     fun provideWeight(sharedPref: SharedPreferences) = sharedPref.getFloat(KEY_WEIGHT, 0f)
-
 
 
     @Singleton

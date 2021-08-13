@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.registrerutes.R
 import com.example.registrerutes.adapters.ExploreAdapter
 import com.example.registrerutes.db.Route
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.*
 import kotlinx.android.synthetic.main.fragment_explore.*
@@ -21,6 +22,7 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
     private lateinit var exploreRecyclerview : RecyclerView
     private lateinit var exploreAdapter : ExploreAdapter
     private lateinit var routeArrayList : ArrayList<Route>
+    private var coordinates = arrayListOf<LatLng>()
 
     private lateinit var lastResult: DocumentSnapshot
 
@@ -73,6 +75,7 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
         var query : Query
 
         query = db.collection("routes")
+       // query = query.orderBy("timestamp", Query.Direction.DESCENDING)
 
         if (routeArrayList.isEmpty()) {
             if (dificulty != "")
@@ -82,7 +85,6 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
             if (title != "") {
                 query = query.whereGreaterThanOrEqualTo("title", title)
             }
-            query = query.orderBy("timestamp", Query.Direction.DESCENDING)
             query = query.limit(5)
 
         } else {
@@ -91,9 +93,9 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
             if(modality != "")
                 query = query.whereEqualTo("modality", modality)
             if (title != "") {
-                query = query.whereGreaterThanOrEqualTo("title", title)
+                query = query.whereLessThanOrEqualTo("title", title)
             }
-            query = query.orderBy("timestamp", Query.Direction.DESCENDING)
+            //query = query.orderBy("timestamp", Query.Direction.DESCENDING)
             query = query.startAfter(lastResult).limit(5)
         }
 
@@ -129,12 +131,17 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
     override fun onItemClicked(route: Route) {
 
         val bundle = Bundle()
+
+        for(pos in route.coordinates!!){
+            val coord = LatLng(pos.latitude, pos.longitude)
+            coordinates.add(coord)
+        }
+
+
+        bundle.putParcelableArrayList("coordinates", coordinates)
         bundle.putString("uri", route.uri)
         bundle.putString("description", route.description)
         bundle.putString("title", route.title)
-        route.distanceInMeters?.let { bundle.putInt("distance", it) }
-        route.timeInMillis?.let { bundle.putLong("time", it) }
-
 
         findNavController().navigate(R.id.trackFragment, bundle)
     }

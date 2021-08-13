@@ -65,27 +65,28 @@ class PersonalFragment : Fragment(R.layout.fragment_personal) {
             navHostFragment.findNavController().navigate(R.id.exploreFragment)
         }
 
-        groupsButton.setOnClickListener {
-            navHostFragment.findNavController().navigate(R.id.action_personalFragment_to_groupFragment)
-        }
+        val email = sharedPreferences.getString(KEY_MAIL, null)
 
-        //Recollim les estadístiques totals de l'usuari i les passem als seus respectius textview
-        totalStatistics() { time: Int ,distance: Int, total_avg_speed: Float ,calories: Int ->
-            val totalTimeRun = TrackingUtility.getFormattedStopWatchTime(time.toLong()) //Passem el temps en milisegons al format (00:00:00)
-            tvTotalTime.text = totalTimeRun
+        if(email != null) {
+            //Recollim les estadístiques totals de l'usuari i les passem als seus respectius textview
+            totalStatistics() { time: Int, distance: Int, total_avg_speed: Float, calories: Int ->
+                val totalTimeRun =
+                    TrackingUtility.getFormattedStopWatchTime(time.toLong()) //Passem el temps en milisegons al format (00:00:00)
+                tvTotalTime.text = totalTimeRun
 
-            val avgSpeed = round(total_avg_speed * 10f) / 10f
-            val avgSpeedString = "${avgSpeed}km/h"
-            tvAverageSpeed.text = avgSpeedString
+                val avgSpeed = round(total_avg_speed * 10f) / 10f
+                val avgSpeedString = "${avgSpeed}km/h"
+                tvAverageSpeed.text = avgSpeedString
 
-            val km = distance / 1000f //Passem la distància a Km
-            val totalDistance = round(km * 10f) / 10f
-            val totalDistanceString = "${totalDistance}km"
-            tvTotalDistance.text = totalDistanceString
+                val km = distance / 1000f //Passem la distància a Km
+                val totalDistance = round(km * 10f) / 10f
+                val totalDistanceString = "${totalDistance}km"
+                tvTotalDistance.text = totalDistanceString
 
-            val totalCalories = "${calories}kcal"
-            tvTotalCalories.text = totalCalories
+                val totalCalories = "${calories}kcal"
+                tvTotalCalories.text = totalCalories
 
+            }
         }
 
     }

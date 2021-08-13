@@ -1,6 +1,7 @@
 package com.example.registrerutes.other
 
 import android.graphics.Color
+import androidx.core.content.ContextCompat
 
 object Constants {
     const val REQUEST_CODE_LOCATION_PERMISSION = 0
@@ -13,16 +14,14 @@ object Constants {
 
     const val SHARED_PREFERENCES_NAME = "sharedPref"
     const val KEY_FIRST_TIME_TOGGLE = "KEY_FIRST_TIME_TOGGLE"
-    const val KEY_NAME = "KEY_NAME"
     const val KEY_WEIGHT = "KEY_WEIGHT"
     const val KEY_MAIL = "KEY_MAIL"
 
     const val LOCATION_UPDATE_INTERVAL = 5000L
     const val FASTEST_LOCATION_INTERVAL = 2000L
 
-    const val POLYLINE_COLOR = Color.BLUE
-    const val POLYLINE_WIDTH = 20f
-    const val MAP_ZOOM = 17f
+    const val POLYLINE_WIDTH = 23f
+    const val MAP_ZOOM = 18.5f
 
     const val NOTIFICATION_CHANNEL_ID = "tracking channel"
     const val NOTIFICATION_CHANNEL_NAME = "tracking"

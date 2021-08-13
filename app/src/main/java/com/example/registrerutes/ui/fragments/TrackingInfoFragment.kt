@@ -11,10 +11,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.registrerutes.R
 import com.example.registrerutes.other.Constants.KEY_MAIL
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_tracking_info.*
@@ -32,6 +34,7 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
     private var distance: Int = 0
     private var time: Long = 0L
     private lateinit var snapshot: Bitmap
+    private var coordinates = arrayListOf<GeoPoint>()
 
     @Inject
     lateinit var sharedPref: SharedPreferences
@@ -77,8 +80,23 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
             this.snapshot = it
         }
 
+        arguments?.getParcelableArrayList<LatLng>("coordinates")?.let {
+            //Convertim la taula de LatLng a una taula de Geopoint per poder guardar-la a firebase
+
+            for (pos in it){
+                val lat = pos.latitude
+                val long = pos.longitude
+                val geo = GeoPoint(lat, long)
+                this.coordinates.add(geo)
+            }
+        }
+
         saveRun.setOnClickListener{
             endRunAndSaveToDb()
+        }
+
+        cancelRun.setOnClickListener {
+            findNavController().navigate(R.id.runFragment)
         }
 
     }
@@ -149,6 +167,7 @@ class TrackingInfoFragment : Fragment (R.layout.fragment_tracking_info) {
             "distanceInMeters" to route.distanceInMeters,
             "timeInMillis" to route.timeInMillis,
             "caloriesBurned" to route.caloriesBurned,
+            "coordinates" to coordinates,
             "uri" to uri,
             "key" to key
         )

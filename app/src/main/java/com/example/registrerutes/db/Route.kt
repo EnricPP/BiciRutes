@@ -1,5 +1,9 @@
 package com.example.registrerutes.db
 
+import com.google.firebase.firestore.GeoPoint
+import com.google.type.LatLng
+
+
 data class Route(var title: String ? = "",
                  val timestamp: Long ? = 0,
                  val description: String ? = "",
@@ -9,6 +13,8 @@ data class Route(var title: String ? = "",
                  val caloriesBurned: Int ? = 0,
                  val modality: String ? = "",
                  val dificulty: String ? = "",
+                 val coordinates : ArrayList<GeoPoint> ? = arrayListOf<GeoPoint>(),
                  val user: String ? = "",
                  val uri: String ? = "",
                  val key: String ? = "")
+

@@ -15,6 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ui.activities.FollowTrack"></activity>
         <activity
             android:name=".ui.activities.MainActivity"
             android:launchMode="singleTask"
@@ -27,6 +28,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service
             android:name=".services.TrackingService"
             android:foregroundServiceType="location" />

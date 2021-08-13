@@ -3,6 +3,7 @@ package com.example.registrerutes.ui.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -11,13 +12,13 @@ import com.example.registrerutes.other.Constants.ACTION_PAUSE_SERVICE
 import com.example.registrerutes.other.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.example.registrerutes.other.Constants.ACTION_STOP_SERVICE
 import com.example.registrerutes.other.Constants.MAP_ZOOM
-import com.example.registrerutes.other.Constants.POLYLINE_COLOR
 import com.example.registrerutes.other.Constants.POLYLINE_WIDTH
 import com.example.registrerutes.other.TrackingUtility
 import com.example.registrerutes.services.Polyline
 import com.example.registrerutes.services.TrackingService
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -29,6 +30,7 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
 
     private var isTracking = false
     private var pathPoints = mutableListOf<Polyline>()
+    private var coordinates = arrayListOf<LatLng>()
 
     private var map: GoogleMap? = null
 
@@ -138,6 +140,15 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
                 distanceInMeters += TrackingUtility.calculatePolylineLenght(polyline).toInt() //Càlcul de la distància total
             }
             val bundle = Bundle()
+
+            //Afegim totes les coordenades de la ruta al ArrayList coordinates
+            for (polyline in pathPoints) {
+                for(pos in polyline) {
+                    this.coordinates.add(pos)
+                }
+            }
+
+            bundle.putParcelableArrayList("coordinates", coordinates)
             bundle.putParcelable("snapshot", it)
             bundle.putLong("time", curTimeInMillis)
             bundle.putInt("distance", distanceInMeters)
@@ -201,7 +212,7 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
     private fun addAllPolylines () {
         for (polyline in pathPoints) {
             val polylineOptions = PolylineOptions()
-                .color(POLYLINE_COLOR)
+                .color(ContextCompat.getColor(this.requireContext(), R.color.route))
                 .width(POLYLINE_WIDTH)
                 .addAll(polyline)
             map?.addPolyline(polylineOptions)
@@ -214,7 +225,7 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
             val preLastLatLng = pathPoints.last()[pathPoints.last().size - 2]
             val lastLatLng = pathPoints.last().last()
             val polylineOptions = PolylineOptions() // Definim com ha de ser la línia del recorregut
-                .color(POLYLINE_COLOR)
+                .color(ContextCompat.getColor(this.requireContext(), R.color.route))
                 .width(POLYLINE_WIDTH)
                 .add(preLastLatLng)
                 .add(lastLatLng)
@@ -262,3 +273,5 @@ class TrackingFragment : Fragment(R.layout.fragment_traking)  {
     }
 
 }
+
+

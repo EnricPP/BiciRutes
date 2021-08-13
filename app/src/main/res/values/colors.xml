@@ -17,4 +17,5 @@
     <color name="errorColor">#D50000</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="route">#f39f18</color>
 </resources>
