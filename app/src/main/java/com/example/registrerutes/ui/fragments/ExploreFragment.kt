@@ -75,16 +75,13 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
         var query : Query
 
         query = db.collection("routes")
-       // query = query.orderBy("timestamp", Query.Direction.DESCENDING)
+        query = query.orderBy("timestamp", Query.Direction.DESCENDING)
 
         if (routeArrayList.isEmpty()) {
             if (dificulty != "")
                 query = query.whereEqualTo("dificulty", dificulty)
             if(modality != "")
                 query = query.whereEqualTo("modality", modality)
-            if (title != "") {
-                query = query.whereGreaterThanOrEqualTo("title", title)
-            }
             query = query.limit(5)
 
         } else {
@@ -92,10 +89,6 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
                 query = query.whereEqualTo("dificulty", dificulty)
             if(modality != "")
                 query = query.whereEqualTo("modality", modality)
-            if (title != "") {
-                query = query.whereLessThanOrEqualTo("title", title)
-            }
-            //query = query.orderBy("timestamp", Query.Direction.DESCENDING)
             query = query.startAfter(lastResult).limit(5)
         }
 
@@ -110,7 +103,12 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
                     }
                     for (dc : DocumentChange in value?.documentChanges!!){
                         if (dc.type == DocumentChange.Type.ADDED){
-                            routeArrayList.add(dc.document.toObject(Route::class.java))
+                            if (title.isNullOrEmpty())
+                                routeArrayList.add(dc.document.toObject(Route::class.java))
+                            else{
+                                if (dc.document["title"].toString().contains(title))
+                                    routeArrayList.add(dc.document.toObject(Route::class.java))
+                            }
                         }
                     }
                     if (value.size() > 0) {
