@@ -106,7 +106,7 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), ExploreAdapter.Item
                             if (title.isNullOrEmpty())
                                 routeArrayList.add(dc.document.toObject(Route::class.java))
                             else{
-                                if (dc.document["title"].toString().contains(title))
+                                if (dc.document["title"].toString().toLowerCase().contains(title.toLowerCase()))
                                     routeArrayList.add(dc.document.toObject(Route::class.java))
                             }
                         }
